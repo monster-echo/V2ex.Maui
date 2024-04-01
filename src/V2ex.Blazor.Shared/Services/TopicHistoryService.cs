@@ -7,21 +7,25 @@ public class TopicHistoryService
     private const string TopicHistoryFileName = "topics.json";
 
     private readonly List<Topic> _history = [];
-    public TopicHistoryService(IPreferences preferences)
+    private readonly Task _loadTask;
+    public TopicHistoryService(IBlobStorage blobStorage)
     {
-        this.Preferences = preferences;
-        this.Load();
+        this.BlobStorage = blobStorage;
+        this._loadTask = this.Load();
     }
 
-    private IPreferences Preferences { get; }
+    private IBlobStorage BlobStorage { get; }
 
-    private void Load()
+    private async Task Load()
     {
-        _history.AddRange(Preferences.Get(TopicHistoryFileName, Array.Empty<Topic>()));
+        _history.AddRange(await BlobStorage.LoadAsync(TopicHistoryFileName, Array.Empty<Topic>()));
     }
 
-    public void Push(Topic topic)
+    public async Task PushAsync(Topic topic)
     {
+
+        await _loadTask;
+
         var existTopic = _history.FirstOrDefault(x => x.Id == topic.Id);
 
         if (existTopic != null)
@@ -35,11 +39,12 @@ public class TopicHistoryService
         {
             _history.Remove(_history.Last());
         }
-        Preferences.Set(TopicHistoryFileName, _history);
+        await BlobStorage.SaveAsync(TopicHistoryFileName, _history);
     }
 
-    public IReadOnlyList<Topic> GetList()
+    public  async Task<IReadOnlyList<Topic>> GetListAsync()
     {
+        await _loadTask;
         return _history;
     }
 }

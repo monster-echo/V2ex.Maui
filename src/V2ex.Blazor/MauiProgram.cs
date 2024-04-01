@@ -63,6 +63,7 @@ public static class MauiProgram
         builder.Services.AddScoped<IPreferences, NativePreferences>();
         builder.Services.AddScoped<IToastService, NativeToastService>();
         builder.Services.AddScoped<IAppInfoService, AppInfoService>();
+        builder.Services.AddTransient<IBlobStorage, BlobStorage>();
         builder.Services.AddSingleton<CookieContainerService>();
         builder.Services.AddSingleton<AuthenticationStateProvider, V2exAuthenticationStateProvider>();
         builder.Services.AddSingleton<IAuthenticationStateProvider, V2exAuthenticationStateProvider>();

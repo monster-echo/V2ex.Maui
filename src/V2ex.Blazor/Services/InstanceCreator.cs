@@ -1,5 +1,4 @@
-﻿
-namespace V2ex.Blazor.Services;
+﻿namespace V2ex.Blazor.Services;
 
 public class InstanceCreator
 {

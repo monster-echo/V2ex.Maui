@@ -62,18 +62,18 @@
     private ILogger<Topic> Logger { get; set; } = null!;
     override protected void OnInitialized()
     {
-        
+
     }
 
 
-    private void GoToTopic()
+    private async Task GoToTopic()
     {
         if (string.IsNullOrEmpty(ViewModel.Id))
         {
             return;
         }
 
-        this.TopicHistoryService.Push(new Services.Topic(
+        await this.TopicHistoryService.PushAsync(new Services.Topic(
             this.ViewModel.Id,
             this.ViewModel.Title.ToString(),
             this.ViewModel.UserName,

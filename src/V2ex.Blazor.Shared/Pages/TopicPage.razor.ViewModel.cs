@@ -138,18 +138,18 @@ public record TopicPageViewModel(
             {
                 continue;
             }
-          
+
             foreach (Mention mention in reply.Mentions)
             {
-                    foreach (var rly in Replies)
+                foreach (var rly in Replies)
+                {
+                    if (rly.UserName == mention.UserName && (mention.Floor == 0 || mention.Floor == rly.Floor))
                     {
-                        if (rly.UserName == mention.UserName && (mention.Floor==0 || mention.Floor == rly.Floor))
-                        {
-                            rly.Replies.Add(reply);
-                            reply.Parent = rly;
-                        }
+                        rly.Replies.Add(reply);
+                        reply.Parent = rly;
                     }
                 }
+            }
             
             Replies.Add(reply);
         }

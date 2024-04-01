@@ -43,14 +43,14 @@
     }
 
 
-    private void GoToTopic()
+    private async Task GoToTopic()
     {
         var link = ViewModel.Link;
 
         if (string.IsNullOrEmpty(link))
             return;
 
-        this.TopicHistoryService.Push(new Services.Topic(
+        await this.TopicHistoryService.PushAsync(new Services.Topic(
             this.ViewModel.Id,
             this.ViewModel.Title.ToString(),
             this.ViewModel.UserName,

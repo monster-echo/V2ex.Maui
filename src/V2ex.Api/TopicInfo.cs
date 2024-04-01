@@ -80,7 +80,7 @@ public class TopicInfo
     [XPath("//div[@id='Wrapper']//div[@class='header']/a[2]", "href")]
     public string NodeLink { get; set; } = null!;
 
-    [XPath("//div[@id='Wrapper']/div/div[@class='box'][3]/div[@class='cell'][1]/span")]
+    [XPath("//div[@id='Wrapper']/div//div[@class='box']/div[@class='cell']/span[@class='gray']")]
     [SkipNodeNotFound]
     public string? ReplyStats { get; set; }
 

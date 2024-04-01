@@ -34,9 +34,9 @@
         return LoadAsync();
     }
 
-    private Task LoadAsync()
+    private async Task LoadAsync()
     {
-        var topics = this.TopicHistoryService.GetList();
+        var topics = await this.TopicHistoryService.GetListAsync();
 
         this.topics = topics.Select(o => new TopicViewModel(
             o.Id,
@@ -53,6 +53,5 @@
             null,
             o.Replies
         )).ToList();
-        return Task.CompletedTask;
     }
 }
