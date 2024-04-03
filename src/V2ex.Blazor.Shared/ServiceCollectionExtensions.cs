@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddBlazorShared(this IServiceCollection services)
     {
+        services.AddTransient<NetworkProxyService>();
         services.AddTransient<ChatGPTService>();
         services.AddScoped<EmojiService>();
         services.AddScoped<TopicHistoryService>();

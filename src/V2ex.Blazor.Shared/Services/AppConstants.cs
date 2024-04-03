@@ -1,5 +1,4 @@
 ﻿namespace V2ex.Blazor.Services;
-
 public class AppConstants
 {
     public static bool IsDebug

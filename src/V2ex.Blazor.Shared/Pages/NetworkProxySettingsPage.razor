@@ -1,0 +1,166 @@
+﻿@page "/settings-network-proxy"
+<div class="max-w-md w-full mx-auto">
+    <div class="flex flex-wrap p-4 pb-2">
+        <div class="flex items-center me-4">
+            <input id="none-radio" type="radio"
+                   checked="@(ProxyType == ProxyType.None)"
+                   @onchange="@(()=> this.ProxyType = ProxyType.None)"
+                   name="proxy-radio"
+                   class="w-4 h-4 text-pink-600 bg-gray-100 border-gray-300   dark:bg-gray-700 dark:border-gray-600">
+            <label for="none-radio"
+                   class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">无</label>
+        </div>
+        <div class="flex items-center me-4">
+            <input id="socks5-radio" type="radio" 
+                    checked="@(ProxyType == ProxyType.Socks5)"
+                    @onchange="@(()=> this.ProxyType = ProxyType.Socks5)"
+                    name="proxy-radio" 
+                    class="w-4 h-4 text-pink-600 bg-gray-100 border-gray-300   dark:bg-gray-700 dark:border-gray-600">
+            <label for="socks5-radio" 
+                    class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">SOCKS5</label>
+        </div>
+        <div class="flex items-center">
+            <input id="http-radio" type="radio" 
+                    checked="@(ProxyType == ProxyType.Http)"
+                    @onchange="@(()=> this.ProxyType = ProxyType.Http)"
+                    name="proxy-radio" 
+                    class="w-4 h-4 text-pink-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600">
+            <label for="http-radio" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">HTTP</label>
+        </div>
+    </div>
+
+    @if(ProxyType != ProxyType.None)
+    {
+        <div class="my-2 px-4">
+            <div class="text-gray-400 font-semibold my-2">Socket Address</div>
+
+            <div class="flex flex-row space-x-2">
+                <div class="flex-1">
+                    <label for="hostname" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Hostname</label>
+                    <input type="text" id="hostname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                           @bind="Hostname"
+                           placeholder="Hostname" />
+                </div>
+
+                <div class="">
+                    <label for="port" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Port</label>
+                    <input type="text" id="port" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Port"
+                           @bind="Port" />
+                </div>
+            </div>
+        </div>
+
+        <div class="my-2 px-4">
+            <div class="text-gray-400 font-semibold my-2">Credentials(optional)</div>
+
+            <div class="flex flex-col">
+                <div>
+                    <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">User name</label>
+                    <input type="text" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Username"
+                           @bind="Username" />
+                </div>
+
+                <div class="mt-2">
+                    <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                    <input type="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="•••••••••"
+                           @bind="Password" />
+                </div>
+            </div>
+        </div>
+    }
+    <div class="flex place-content-end my-2 px-4 space-x-4">
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600"
+            @onclick="CancelAsync">
+            取消
+        </button>
+
+        @if(ProxyType != ProxyType.None)
+        {
+            <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600"
+                    @onclick="TestAsync">
+                测试
+            </button>
+        }
+
+        <button type="button" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600"
+            @onclick="SaveAsync">
+            保存
+        </button>
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private ILogger<NetworkProxySettingsPage> Logger { get; set; } = null!;
+    [Inject]
+    private NetworkProxyService NetworkProxyService { get; set; } = null!;
+
+    [Inject]
+    private IToastService ToastService { get; set; } = null!;
+    [Inject]
+    private INativeNavigation Navigation { get; set; } = null!;
+
+    private ProxyType ProxyType { get; set; } = ProxyType.Socks5;
+    private string Hostname { get; set; } = "127.0.0.1";
+    private int Port { get; set; } = 1080;
+    private string? Username { get; set; }
+    private string? Password { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await NetworkProxyService.GetAsync();
+        this.Hostname = settings.Hostname;
+        this.Port = settings.Port;
+        this.Username = settings.Username;
+        this.Password = settings.Password;
+        this.ProxyType = settings.ProxyType;
+    }
+
+    private async Task CancelAsync()
+    {
+        await Navigation.GoBack();
+    }
+
+    private async Task SaveAsync()
+    {
+        try
+        {
+            var settings = new NetworkProxySettings
+            {
+                ProxyType = this.ProxyType,
+                Hostname = this.Hostname,
+                Port = this.Port,
+                Username = this.Username,
+                Password = this.Password
+            };
+            await NetworkProxyService.SaveAsync(settings);
+
+            await ToastService.Show("保存成功!");
+        }
+        catch (Exception exception)
+        {
+            Logger.LogWarning(exception, "Save network proxy error");
+            await ToastService.Show("保存失败");
+        }
+    }
+
+    private async Task TestAsync()
+    {
+        var settings = new NetworkProxySettings
+        {
+            ProxyType = this.ProxyType,
+            Hostname = this.Hostname,
+            Port = this.Port,
+            Username = this.Username,
+            Password = this.Password
+        };
+        if(await NetworkProxyService.TestAsync(settings))
+        {
+            await ToastService.Show("连接成功!");
+        }
+        else
+        {
+            await ToastService.Show("连接失败");
+        }
+    }
+}
