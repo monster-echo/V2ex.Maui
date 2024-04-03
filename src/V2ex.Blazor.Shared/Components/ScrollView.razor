@@ -9,11 +9,19 @@
     [Parameter]
     public EventCallback<ScrollEventArgs> OnScrollCallback { get; set; }
 
+    [Parameter]
+    public EventCallback RemainingReachedCallback { get; set; }
+
+    [Parameter]
+    public int RemainingHeight { get; set; } = 100;
+
     [Inject]
     private IJSRuntime JsRuntime { get; set; } = null!;
     private ElementReference? containerRef;
     private DotNetObjectReference<ScrollView>? thisRef;
     private IJSObjectReference? module;
+    private double lastScrollHeight;
+
 
     protected override void OnInitialized()
     {
@@ -45,5 +53,18 @@
     public async Task OnScrollAsync(double scrollTop, double scrollHeight, double clientHeight)
     {
         await this.OnScrollCallback.InvokeAsync(new ScrollEventArgs(scrollTop, scrollHeight, clientHeight));
+
+        if (scrollHeight != lastScrollHeight)
+        {
+            // the elements in the container have changed, so the scroll bar will change
+            lastScrollHeight = scrollHeight;
+            return;
+        }
+
+        var heightToBottom = scrollHeight - scrollTop - clientHeight;
+        if (heightToBottom < RemainingHeight)
+        {
+            await this.RemainingReachedCallback.InvokeAsync();
+        }
     }
 }
