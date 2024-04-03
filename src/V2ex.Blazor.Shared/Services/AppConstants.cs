@@ -15,5 +15,5 @@ public class AppConstants
 
     public const string BlazorHybridHost = "0.0.0.0";
 
-    
+    public const string GithubRepository = "https://github.com/rwecho/V2ex.Maui.git";
 }

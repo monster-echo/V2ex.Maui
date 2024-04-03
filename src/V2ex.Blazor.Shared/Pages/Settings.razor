@@ -6,7 +6,7 @@
 
 <div class="flex flex-col h-full w-full max-w-md mx-auto">
     <div class="flex flex-col flex-1 w-full overflow-y-auto">
-        <div class="w-full flex space-x-4 active:bg-gray-100 px-4 py-2 font-medium" onclick="GoToGithubAsync">
+        <div class="w-full flex space-x-4 active:bg-gray-100 px-4 py-2 font-medium" @onclick="GoToGithubAsync">
             <svg class="w-6 h-6 text-gray-800 dark:text-white"
                     aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
@@ -56,7 +56,8 @@
 </div>
 
 @code {
-
+    [Inject]
+    private IBrowser Browser { get; set; } = null!;
     [Inject]
     private AuthenticationStateProvider AuthenticationStateProvider
     {
@@ -99,9 +100,9 @@
 
     }
 
-    private async Task GoToGithubAsync()
+    private Task GoToGithubAsync()
     {
-
+        return Browser.OpenAsync(new Uri(AppConstants.GithubRepository));
     }
 
     private Task GoToNetworkProxyAsync()
