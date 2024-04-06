@@ -2,9 +2,9 @@
 
 public partial class MainPage : ContentPage
 {
-	public MainPage()
-	{
-		InitializeComponent();
+    public MainPage()
+    {
+        InitializeComponent();
 
 
         // The SoftInput in the MainActivity.cs is not working, so we have to do it here.
@@ -16,5 +16,14 @@ public partial class MainPage : ContentPage
             window.SetSoftInputMode(Android.Views.SoftInput.AdjustResize);
 #endif
         });
+
+
     }
+
+
+    private void BlazorWebView_UrlLoading(object sender, Microsoft.AspNetCore.Components.WebView.UrlLoadingEventArgs e)
+    {
+
+    }
+
 }

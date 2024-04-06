@@ -25,7 +25,8 @@
     <BlazorWebView x:Name="blazorWebView"
                     HostPage="wwwroot/index.html"
                     StartPath="{Binding TargetLocation}"
-                    local:WebViewEvents.TitleChangeCommand="{Binding TitleChangeCommand}">
+                    local:WebViewEvents.TitleChangeCommand="{Binding TitleChangeCommand}"
+                    UrlLoading="BlazorWebView_UrlLoading">
         <BlazorWebView.RootComponents>
             <RootComponent x:Name="RootComponent" Selector="#app" ComponentType="{x:Type shared:Main}" />
         </BlazorWebView.RootComponents>

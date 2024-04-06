@@ -12,4 +12,9 @@ public partial class ReturnPage : ContentPage
             { "Url", targetLocation }
         };
     }
+
+    private void BlazorWebView_UrlLoading(object sender, Microsoft.AspNetCore.Components.WebView.UrlLoadingEventArgs e)
+    {
+        e.UrlLoadingStrategy = Microsoft.AspNetCore.Components.WebView.UrlLoadingStrategy.OpenInWebView;
+    }
 }

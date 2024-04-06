@@ -9,7 +9,7 @@
     <ContentPage.Behaviors>
         <toolkit:StatusBarBehavior StatusBarColor="#f3f4f6" StatusBarStyle="DarkContent" />
     </ContentPage.Behaviors>
-    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
+    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html" UrlLoading="BlazorWebView_UrlLoading">
         <BlazorWebView.RootComponents>
             <RootComponent Selector="#app" ComponentType="{x:Type shared:Main}"  />
         </BlazorWebView.RootComponents>
