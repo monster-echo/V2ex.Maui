@@ -15,6 +15,7 @@ public partial class ReturnPage : ContentPage
 
     private void BlazorWebView_UrlLoading(object sender, Microsoft.AspNetCore.Components.WebView.UrlLoadingEventArgs e)
     {
+        // todo: add a whitelist to prevent open malicious website
         e.UrlLoadingStrategy = Microsoft.AspNetCore.Components.WebView.UrlLoadingStrategy.OpenInWebView;
     }
 }
