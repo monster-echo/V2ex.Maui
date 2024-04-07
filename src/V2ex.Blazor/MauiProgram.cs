@@ -13,7 +13,9 @@ using Microsoft.Extensions.Options;
 using System.Reflection;
 using V2ex.Blazor.Pages;
 using V2ex.Blazor.Services;
+using IClipboard = V2ex.Blazor.Services.IClipboard;
 using IPreferences = V2ex.Blazor.Services.IPreferences;
+using IShare = V2ex.Blazor.Services.IShare;
 
 namespace V2ex.Blazor;
 public static class MauiProgram
@@ -57,6 +59,8 @@ public static class MauiProgram
         builder.Services.AddTransient<ApiHttpClientHandler>();
         builder.Services.AddTransient<AiHttpClientHandler>();
         builder.Services.AddTransient<LoginWithGooglePageViewModel>();
+        builder.Services.AddTransient<IShare, NativeShare>();
+        builder.Services.AddTransient<IClipboard, NativeClipboard>();
         builder.Services.AddScoped<INavigationInterceptorService, NavigationInterceptorService>();
         builder.Services.AddScoped<INativeNavigation, NativeNavigation>();
         builder.Services.AddScoped<IAlterService, NativeAlterService>();

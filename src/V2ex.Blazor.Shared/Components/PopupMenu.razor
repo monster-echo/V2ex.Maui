@@ -1,0 +1,75 @@
+﻿<div id="popup-modal" @ref="modalRef"
+    tabindex="-1"
+     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-end md:items-center w-full md:inset-0 !h-full max-h-full">
+    <div class="relative p-0 w-full max-w-md max-h-full">
+        <div class="relative flex flex-col divide-y font-medium bg-white rounded-t-md md:rounded-md shadow dark:bg-gray-700 overflow-hidden">
+            @foreach (var menu in Menus)
+            {
+                <button class="bg-gray-50 w-full py-2 active:bg-gray-100"
+                    @onclick="async ()=> await RaiseMenuClickAsync(menu)">
+                    @menu.Text
+                </button>
+            }
+            <button class="w-full bg-white py-2 font-normal active:bg-gray-50"
+                    @onclick="Hide">
+                取消
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = null!;
+    private IJSObjectReference? interopModule;
+    private IJSObjectReference? modal;
+    private ElementReference modalRef;
+
+    [Parameter]
+    public List<PopupMenuItem> Menus { get; set; } = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            interopModule = await this.JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/V2ex.Blazor.Shared/Components/PopupMenu.razor.js");
+
+            modal = await interopModule.InvokeAsync<IJSObjectReference>(
+                "initialize", 
+                modalRef);
+        }
+    }
+
+    public async Task Show()
+    {
+        if(modal == null)
+        {
+            throw new InvalidOperationException("Modal is not initialized.");
+        }
+        await modal.InvokeVoidAsync("show");
+    }
+
+    public async Task Hide()
+    {
+        if (modal == null)
+        {
+            throw new InvalidOperationException("Modal is not initialized.");
+        }
+        await modal.InvokeVoidAsync("hide");
+    }
+
+    private async Task RaiseMenuClickAsync(PopupMenuItem item)
+    {
+        try
+        {
+            await item.InvokeAsync();
+        }
+        finally
+        {
+            await this.Hide();   
+        }
+
+    }
+}

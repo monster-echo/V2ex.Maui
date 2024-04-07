@@ -93,7 +93,7 @@
                     </button>
                 }
 
-                <button class="ms-4">
+                <button class="ms-4" @onclick="ShowReplyMenuPopupAsync">
                     <svg class="w-4 h-4 text-gray-400 dark:text-white" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 4 15">
                         <path
@@ -104,6 +104,9 @@
         </div>
     </div>
 </div>
+<PopupMenu @ref="replyPopupMenu"
+           Menus="ReplyPopupMenus"></PopupMenu>
+
 
 @code {
     [Parameter]
@@ -126,6 +129,7 @@
     [CascadingParameter]
     public Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
+    private PopupMenu? replyPopupMenu;
     [Inject]
     private ApiService ApiService { get; set; } = null!;
 
@@ -136,6 +140,24 @@
 
     [Inject]
     private IBrowser Browser { get; set; } = null!;
+
+    [Inject]
+    private IClipboard Clipboard { get; set; } = null!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = null!;
+
+    private List<PopupMenuItem> ReplyPopupMenus {
+        get
+        {
+            return [
+                    new PopupMenuItem("回复", TapMention),
+                    new PopupMenuItem("拷贝", this.CopyAsync),
+                    new PopupMenuItem("他的主页", this.GoToReplyOwnerPage),
+                ];
+        }
+    }
+
 
     protected override async Task OnParametersSetAsync()
     {
@@ -188,6 +210,32 @@
     private Task OnCallUpAllAsync()
     {
         return OnCallUpAsync("");
+    }
+
+    private async Task ShowReplyMenuPopupAsync()
+    {
+        if (replyPopupMenu == null)
+        {
+            return;
+        }
+        await replyPopupMenu.Show();
+    }
+
+    private async Task CopyAsync()
+    {
+        var text = ViewModel.Content?.ToString();
+        if (text == null)
+        {
+            return;
+        }
+        await Clipboard.Copy(text);
+        await Toast.Show("已复制");
+    }
+
+    private Task GoToReplyOwnerPage()
+    {
+        this.NavigationManager.NavigateTo(ViewModel.UserLink);
+        return Task.CompletedTask;
     }
 
     private Task OnExternalLickClicked(Uri uri)

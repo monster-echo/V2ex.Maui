@@ -89,7 +89,6 @@ public record TopicPageViewModel(
     public string? Once { get; set; }
     public List<ReplyViewModel> Replies { get; } = [];
 
-
     public static TopicPageViewModel Create(TopicInfo topicInfo)
     {
         var supplements = topicInfo.Supplements.Select(o => new SupplementViewModel(
@@ -102,7 +101,7 @@ public record TopicPageViewModel(
         topicInfo.UserName,
         topicInfo.UserLink,
         topicInfo.Avatar,
-        topicInfo.CreatedText == null ? null : new MarkupString(topicInfo.CreatedText),
+        topicInfo.NormalizedCreatedText == null ? null : new MarkupString(topicInfo.NormalizedCreatedText),
         topicInfo.Content == null ? null : new MarkupString(topicInfo.Content),
         supplements,
         topicInfo.NodeName,

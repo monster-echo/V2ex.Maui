@@ -1,6 +1,9 @@
-﻿<div class="markup-container text-gray-800 leading-relaxed tracking-wide" @ref="containerRef">
+﻿@using HtmlAgilityPack
+<div class="markup-container text-gray-800 leading-relaxed tracking-wide" @ref="containerRef">
     @Content
 </div>
+
+<ImageViewer @ref="imageViewer" Images="Images"></ImageViewer>
 
 @code {
     [Parameter]
@@ -8,9 +11,6 @@
 
     [Parameter]
     public EventCallback<string> MemberClickedCallback { get; set; }
-
-    [Parameter]
-    public EventCallback<string> ImageClickedCallback { get; set; }
 
     [Parameter]
     public EventCallback<Uri> ExternalLinkClickedCallback { get; set; }
@@ -21,14 +21,27 @@
     [Inject]
     private NavigationManager NavigationManager { get; set; } = null!;
 
+    private List<string> Images { get; set; } = [];
+
     private IJSObjectReference? interopModule;
 
     private ElementReference? containerRef;
     private DotNetObjectReference<MarkupStringView>? thisRef;
+    private ImageViewer? imageViewer;
 
     protected override void OnInitialized()
     {
         thisRef = DotNetObjectReference.Create(this);
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (Content != null)
+        {
+            Images = ParseImages(Content.Value.ToString());
+        }
+
+        return Task.CompletedTask;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -101,6 +114,32 @@
     [JSInvokable]
     public async Task ImageClickedJsInvoke(string src)
     {
-        await ImageClickedCallback.InvokeAsync(src);
+        if (imageViewer == null)
+        {
+            return;
+        }
+
+        await imageViewer.Show(src);
     }
+
+    private List<string> ParseImages(string html)
+    {
+        var images = new List<string>();
+        var doc = new HtmlDocument();
+        doc.LoadHtml(html);
+        var nodes = doc.DocumentNode.SelectNodes("//img");
+        if (nodes != null)
+        {
+            foreach (var node in nodes)
+            {
+                var src = node.GetAttributeValue("src", "");
+                if (!string.IsNullOrEmpty(src))
+                {
+                    images.Add(src);
+                }
+            }
+        }
+        return images;
+    }
+
 }

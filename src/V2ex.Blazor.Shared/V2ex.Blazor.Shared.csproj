@@ -25,4 +25,8 @@
     <ItemGroup>
       <Content Remove="package.json" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\lib\pinch-zoom\" />
+    </ItemGroup>
 </Project>

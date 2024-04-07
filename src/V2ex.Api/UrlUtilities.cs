@@ -28,4 +28,10 @@ public static class UrlUtilities
     {
         return new UriBuilder(CompleteUrl(url)).Path.Split("/").Last();
     }
+
+
+    public static string GetTopicUrl(string id)
+    {
+        return $"{BASE_URL}/t/{id}";
+    }
 }

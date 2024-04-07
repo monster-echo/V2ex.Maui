@@ -22,6 +22,19 @@ public class TopicInfo
     [XPath("//div[@id='Wrapper']//div[@class='header']/small/a/following-sibling::text()")]
     public string CreatedText { get; set; } = null!;
 
+    public string NormalizedCreatedText
+    {
+        get
+        {
+            // at 22 小时 42 分钟前 · 4688 次点击
+            if(!CreatedText.Contains("·"))
+            {
+                return CreatedText;
+            }
+            return CreatedText.Split("·")[0].Replace("at ", "").Trim();
+        }
+    }
+
     [XPath("//div[@id='Wrapper']//a[contains(@href, 'favorite/topic')]/preceding-sibling::span")]
     [SkipNodeNotFound]
     public string? TopicStats { get; set; }

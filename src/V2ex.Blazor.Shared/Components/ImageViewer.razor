@@ -1,0 +1,98 @@
+﻿@implements IAsyncDisposable
+<div id="popup-modal" @ref="modalRef"
+     tabindex="-1"
+     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-end md:items-center w-full md:inset-0 !h-full max-h-full">
+    <div class="relative p-0 w-full max-w-md max-h-full">
+        <div class="relative bg-white shadow dark:bg-gray-700 overflow-hidden">
+            <div class="swiper" style="height:100%" @ref="swiperRef">
+                <div class="swiper-wrapper">
+                    @foreach (var image in Images)
+                    {
+                        <div class="swiper-slide">
+                            <img src="@image" class="w-full h-full object-contain" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public List<string> Images { get; set; } = [];
+
+    private ElementReference modalRef;
+    private ElementReference swiperRef;
+    private IJSObjectReference? interopModule;
+    private IJSObjectReference? modal;
+    private IJSObjectReference? swiper;
+    private IJSObjectReference? pinchZoom;
+
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = null!;
+    private DotNetObjectReference<ImageViewer>? thisRef;
+
+    protected override void OnInitialized()
+    {
+        thisRef = DotNetObjectReference.Create(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            interopModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/V2ex.Blazor.Shared/Components/ImageViewer.razor.js");
+            modal = await interopModule.InvokeAsync<IJSObjectReference>("initializeModal",
+                modalRef);
+
+            swiper = await interopModule.InvokeAsync<IJSObjectReference>("initializeSwiper", swiperRef);
+            pinchZoom = await interopModule.InvokeAsync<IJSObjectReference>("initializePinchZoom", swiperRef);
+        }
+    }
+
+    public async Task Show(string url)
+    {
+        if (!Images.Any())
+        {
+            return;
+        }
+
+        if (modal == null)
+        {
+            throw new InvalidOperationException("Modal is not initialized.");
+        }
+
+        if (swiper == null)
+        {
+            throw new InvalidOperationException("Swiper is not initialized.");
+        }
+
+        await modal.InvokeVoidAsync("show");
+
+        var index = this.Images.IndexOf(url);
+        await this.swiper.InvokeVoidAsync("slideTo", index);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (swiper != null)
+                await swiper.InvokeVoidAsync("destroy");
+
+            if (interopModule != null)
+                await interopModule.DisposeAsync();
+
+            if (pinchZoom != null)
+                await pinchZoom.InvokeVoidAsync("destroy");
+        }
+        catch (JSException)
+        {
+            // todo: handle the exception.
+        }
+    }
+}
